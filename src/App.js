@@ -16,8 +16,7 @@ class Matrix extends React.Component {
 
   handleTableEvent(event) {
     let attributes = event.nativeEvent.target.attributes;
-    let innerHtml = +event.nativeEvent.target.innerText;
-    if (event.target = 'th' && attributes) {
+    if (event.target.tagName === 'TH' && attributes) {
       if (attributes.index && attributes.index.value >= 0) {
         if (event.type === 'click') {
           this.increaseCell.call(this, attributes.index.value);
