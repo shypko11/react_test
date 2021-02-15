@@ -3,10 +3,7 @@ import Column from '../table/Column'
 
 
 class Table extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
+   
     offAllLight() {
         let event = new Event("offHints");
         window.dispatchEvent(event);
