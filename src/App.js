@@ -12,6 +12,7 @@ class Matrix extends React.Component {
     this.addLine = this.addLine.bind(this);
     this.handleTableEvent = this.handleTableEvent.bind(this);
     this.offHints = this.offHints.bind(this);
+    //ffff
   }
 
   handleTableEvent(event) {
