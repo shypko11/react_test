@@ -1,14 +1,16 @@
 import React from 'react';
-import Column from '../table/Column'
+import Column from '../table/Column';
 
-
-class Table extends React.Component {
+interface MyProps {
+    rows:Array<any>
+};
+class Table extends React.Component<MyProps, {}> {
    
-    offAllLight() {
+    offAllLight(): void {
         let event = new Event("offHints");
         window.dispatchEvent(event);
     }
-    generateAverageValues(rows) {
+    generateAverageValues(rows: Array<any>) {
         if (!rows || !rows.length) {
             return;
         }

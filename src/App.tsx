@@ -1,32 +1,51 @@
 import React from 'react';
 import Table from './table/Table'
-
-class Matrix extends React.Component {
-  constructor(props) {
+interface MyState {
+  rows:Array<any>,
+  oldRows:Array<any>,
+  closest: string | number,
+  x?:number,
+  y?:number
+};
+interface Cell {
+  amount: number
+  id:number
+  lighted:boolean,
+  percent: string,
+  showPercent: true
+};
+class Matrix extends React.Component<{}, MyState> {
+  constructor(props:number) {
     super(props);
-    this.state = { rows: [], oldRows: [] };
-    this.old = [];
+    this.state = { rows: [], oldRows: [], closest: 0 };
     this.handleChange = this.handleChange.bind(this);
     this.createMatrix = this.createMatrix.bind(this);
     this.removeLine = this.removeLine.bind(this);
     this.addLine = this.addLine.bind(this);
     this.handleTableEvent = this.handleTableEvent.bind(this);
     this.offHints = this.offHints.bind(this);
+    //ffff
   }
 
-  handleTableEvent(event) {
-    let attributes = event.nativeEvent.target.attributes;
-    if (event.target.tagName === 'TH' && attributes) {
-      if (attributes.index && attributes.index.value >= 0) {
+  handleTableEvent(event:any) {
+    let collumnindex;
+    let index;
+    let data_attributes = event.target.dataset;
+   
+    if (event.target.tagName === 'TH' ) {
+        collumnindex = data_attributes.collumnindex ? +data_attributes.collumnindex : -1;
+        index = data_attributes.index ? +data_attributes.index : -1;
+      if (index >= 0) {
         if (event.type === 'click') {
-          this.increaseCell.call(this, attributes.index.value);
+          this.increaseCell.call(this, index);
         } else if (event.type === 'mouseover') {
-          let closest = this.findClosest.call(this, attributes.index.value);
+          let closest = this.findClosest.call(this, index);
+          if(closest){
           this.highlightClosest.call(this, closest);
+          }
         }
-      } else if (attributes.collumnIndex && attributes.collumnIndex.value >= 0) {
-        let index = attributes.collumnIndex.value;
-        this.state.rows[index].forEach(function (elem) {
+      } else if (collumnindex >= 0) {
+        this.state.rows[collumnindex].forEach(function (elem:Cell) {
           elem.showPercent = true;
         });
         this.setState({ rows: this.state.rows })
@@ -34,11 +53,11 @@ class Matrix extends React.Component {
     }
   }
 
-  findClosest(_id) {
-    let data = this.state.rows.slice(),
-      qty = typeof (+this.state.closest) === "number" && +this.state.closest,
-      arrGeneral = [],
-      result;
+  findClosest(_id: number): Array<Cell> | undefined {
+    let data = this.state.rows.slice();
+    let qty: any= typeof (+this.state.closest) === "number" && +this.state.closest;
+    let arrGeneral: Array<any>= [];
+    let  result;
     if (!qty) {
       return;
     }
@@ -48,13 +67,13 @@ class Matrix extends React.Component {
     if (qty > arrGeneral.length) {
       qty = arrGeneral.length;
     }
-    function sortByAmmount(arr) {
+    function sortByAmmount(arr: Array<Cell>) {
       arr.sort((a, b) => a.amount > b.amount ? 1 : -1);
     }
     sortByAmmount(arrGeneral);
 
     arrGeneral.forEach(function (elem, index) {
-      if (elem.id === +_id) {
+      if (elem.id === _id) {
         let start = Math.floor(index - ((qty + 1) / 2));
         let end = Math.floor(index + ((qty + 1) / 2));
         if (start < 0) {
@@ -72,19 +91,20 @@ class Matrix extends React.Component {
           } while (end > (arrGeneral.length - 1));
         }
         result = arrGeneral.slice(start, end);
+        return result;
       }
     })
-    return result;
+   
   }
 
-  highlightClosest(closestArr) {
+  highlightClosest(closestArr:Array<Cell> | undefined) {
     if (closestArr) {
       let self = this;
       this.offHints(function () {
         let newArr = self.state.rows.slice();
         closestArr.forEach(function (elem) {
           for (let i = 0; i < newArr.length; i++) {
-            newArr[i].forEach(function (cell) {
+            newArr[i].forEach(function (cell: Cell) {
               if (!cell || !elem) {
                 return;
               }
@@ -99,7 +119,7 @@ class Matrix extends React.Component {
     }
   }
 
-  offHints(callback) {
+  offHints(callback: any) {
     let table = this.state.rows;
     for (let i = 0; i < table.length; i++) {
       for (let j = 0; j < table[i].length; j++) {
@@ -111,7 +131,7 @@ class Matrix extends React.Component {
     callback && callback();
   }
 
-  increaseCell(_id) {
+  increaseCell(_id:number) {
     let arr = this.state.rows.slice();
     arr.forEach(function (elem) {
       for (let i = 0; i < elem.length; i++) {
@@ -125,7 +145,7 @@ class Matrix extends React.Component {
     this.setState({ rows: arr });
   }
 
-  handleChange(event) {
+  handleChange(event:any) {
     if (event.target.name === 'x') {
       this.setState({ x: event.target.value });
     } else if (event.target.name === 'y') {
@@ -135,7 +155,7 @@ class Matrix extends React.Component {
     }
   }
 
-  randomNumber(max, min) {
+  randomNumber(max: number, min: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
@@ -163,34 +183,38 @@ class Matrix extends React.Component {
     this.setState({ rows: newArr });
   }
 
-  createMatrix(event) {
+  createMatrix(event:any) {
     event.preventDefault();
-    const y = this.state.y;
+    const y  = this.state.y;
     const x = this.state.x;
     let localRows = [];
     let counter = 0;
-    for (let i = 0; i < x; i++) {
-      let sum = 0;
-      let column = [];
-      for (let j = 0; j < y; j++) {
-        let value = this.randomNumber(999, 100);
-        column[j] = {
-          id: counter++,
-          amount: value,
-          lighted: false
-        };
-        sum += value;
+    if(x && y){
+      for (let i = 0; i < x; i++) {
+        let sum = 0;
+        let column = [];
+        for (let j = 0; j < y; j++) {
+          let value = this.randomNumber(999, 100);
+          column[j] = {
+            id: counter++,
+            amount: value,
+            lighted: false,
+            percent: ''
+          };
+          sum += value;
+        }
+        column.forEach(function (element) {
+          let perc = element.amount / sum * 100;
+          element.percent = Math.round(perc) + "%";
+        })
+        localRows.push(column);
       }
-      column.forEach(function (element) {
-        let perc = element.amount / sum * 100;
-        element.percent = Math.round(perc) + "%";
-      })
-      localRows.push(column);
     }
+   
     this.setState({ rows: localRows });
-    window.addEventListener("offHints", (function (event) {
-      this.offHints();
-    }).bind(this));
+    window.addEventListener("offHints",  () => {
+      this.offHints(false);
+    });
   }
 
 
