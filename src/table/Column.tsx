@@ -4,7 +4,13 @@ interface MyProps {
     collIndex: number,
     rows:Array<any>
 };
-
+type Cell = {
+    amount: number,
+    id:number,
+    lighted:boolean,
+    percent: string,
+    showPercent: boolean
+  };
 
 class Column extends React.Component<MyProps, {}> {
    
@@ -13,15 +19,15 @@ class Column extends React.Component<MyProps, {}> {
         let event = new Event("offHints");
         window.dispatchEvent(event);
     }
-
+ 
     render() {
         let tableCol = [];
         let sum = 0;
         for (let i = 0; i < this.props.data.length; i++) {
            
-            let cellData = this.props.data[i];
-            let inner: number = cellData.showPercent ? cellData.percent : cellData.amount;
-            let heightPercent: number = cellData.showPercent ? cellData.percent : 0;
+            let cellData: Cell = this.props.data[i];
+            let inner: number = cellData.showPercent ? Number(cellData.percent) : cellData.amount;
+            let heightPercent: string = cellData.showPercent ? cellData.percent : "0";
             sum += cellData.amount;
             let columns = (<th data-index ={cellData.id} className={cellData.lighted ? 'light' : 'base'}>
                 {inner}

@@ -1,16 +1,25 @@
 import React from 'react';
 import Column from '../table/Column';
 
-interface MyProps {
+type MyProps = {
     rows:Array<any>
 };
+type Cell = {
+    amount: number,
+    id:number,
+    lighted:boolean,
+    percent: string,
+    showPercent: boolean
+};
+
 class Table extends React.Component<MyProps, {}> {
    
     offAllLight(): void {
         let event = new Event("offHints");
         window.dispatchEvent(event);
     }
-    generateAverageValues(rows: Array<any>) {
+    
+    generateAverageValues(rows: Cell[][]){
         if (!rows || !rows.length) {
             return;
         }

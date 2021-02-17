@@ -1,21 +1,30 @@
 import React from 'react';
-import Table from './table/Table'
-interface MyState {
-  rows:Array<any>,
-  oldRows:Array<any>,
+import Table from './table/Table';
+
+type MyProps = {
+};
+
+type MyState = {
+  rows:Cell[][],
+  oldRows:Cell[][],
   closest: string | number,
   x?:number,
   y?:number
 };
-interface Cell {
-  amount: number
-  id:number
+
+type Cell = {
+  amount: number,
+  id:number,
   lighted:boolean,
   percent: string,
-  showPercent: true
+  showPercent: boolean
 };
-class Matrix extends React.Component<{}, MyState> {
-  constructor(props:number) {
+type Data_attributes = {
+  collumnindex?:number,
+  index?: number
+}
+class Matrix extends React.Component<MyProps, MyState> {
+  constructor(props: MyProps) {
     super(props);
     this.state = { rows: [], oldRows: [], closest: 0 };
     this.handleChange = this.handleChange.bind(this);
@@ -27,14 +36,15 @@ class Matrix extends React.Component<{}, MyState> {
     //ffff
   }
 
-  handleTableEvent(event:any) {
-    let collumnindex;
-    let index;
-    let data_attributes = event.target.dataset;
-   
-    if (event.target.tagName === 'TH' ) {
-        collumnindex = data_attributes.collumnindex ? +data_attributes.collumnindex : -1;
-        index = data_attributes.index ? +data_attributes.index : -1;
+  handleTableEvent(event: React.MouseEvent): void {
+    let collumnindex:number;
+    let index: number;
+    let data_attributes: Data_attributes;
+    let  target = event.target as HTMLElement;
+    if (target && target.tagName  === 'TH' ) {
+        data_attributes = target.dataset;
+        collumnindex = data_attributes.collumnindex ? Number(data_attributes.collumnindex) : -1;
+        index = data_attributes.index ?  Number(data_attributes.index) : -1;
       if (index >= 0) {
         if (event.type === 'click') {
           this.increaseCell.call(this, index);
@@ -55,9 +65,9 @@ class Matrix extends React.Component<{}, MyState> {
 
   findClosest(_id: number): Array<Cell> | undefined {
     let data = this.state.rows.slice();
-    let qty: any= typeof (+this.state.closest) === "number" && +this.state.closest;
-    let arrGeneral: Array<any>= [];
-    let  result;
+    let qty: number = typeof  Number(this.state.closest) === "number" ?  Number(this.state.closest): 0;
+    let arrGeneral: Array<Cell>= [];
+    let  result:Array<Cell>;
     if (!qty) {
       return;
     }
@@ -96,7 +106,7 @@ class Matrix extends React.Component<{}, MyState> {
     })
    
   }
-
+ 
   highlightClosest(closestArr:Array<Cell> | undefined) {
     if (closestArr) {
       let self = this;
@@ -119,7 +129,7 @@ class Matrix extends React.Component<{}, MyState> {
     }
   }
 
-  offHints(callback: any) {
+  offHints(callback: any):void {
     let table = this.state.rows;
     for (let i = 0; i < table.length; i++) {
       for (let j = 0; j < table[i].length; j++) {
@@ -131,11 +141,11 @@ class Matrix extends React.Component<{}, MyState> {
     callback && callback();
   }
 
-  increaseCell(_id:number) {
+  increaseCell(_id: number) {
     let arr = this.state.rows.slice();
     arr.forEach(function (elem) {
       for (let i = 0; i < elem.length; i++) {
-        if (elem[i].id === +_id) {
+        if (elem[i].id === Number(_id)) {
           elem[i].amount++;
           elem[i].lighted = true;
           break;
@@ -145,13 +155,14 @@ class Matrix extends React.Component<{}, MyState> {
     this.setState({ rows: arr });
   }
 
-  handleChange(event:any) {
+  handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    // let  target = event.target as HTMLInputElement;
     if (event.target.name === 'x') {
-      this.setState({ x: event.target.value });
+      this.setState({ x: Number(event.target.value) });
     } else if (event.target.name === 'y') {
-      this.setState({ y: event.target.value });
+      this.setState({ y: Number(event.target.value) });
     } else {
-      this.setState({ closest: event.target.value });
+      this.setState({ closest: Number(event.target.value) });
     }
   }
 
@@ -176,14 +187,17 @@ class Matrix extends React.Component<{}, MyState> {
       let value = this.randomNumber(999, 100);
       column[i] = {
         id: ++lastCellId,
-        amount: value,
+        amount: value, 
+        lighted:false,
+        percent: '',
+        showPercent: false
       };
     }
     newArr.push(column);
     this.setState({ rows: newArr });
   }
 
-  createMatrix(event:any) {
+  createMatrix(event: React.FormEvent) {
     event.preventDefault();
     const y  = this.state.y;
     const x = this.state.x;
@@ -199,7 +213,8 @@ class Matrix extends React.Component<{}, MyState> {
             id: counter++,
             amount: value,
             lighted: false,
-            percent: ''
+            percent: '',
+            showPercent: false
           };
           sum += value;
         }
