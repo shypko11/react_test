@@ -1,8 +1,8 @@
 import React from 'react';
 interface MyProps {
-    data:Array<any>,
+    data:Cell[],
     collIndex: number,
-    rows:Array<any>
+    rows:Cell[][]
 };
 type Cell = {
     amount: number,

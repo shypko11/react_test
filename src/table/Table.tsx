@@ -2,7 +2,7 @@ import React from 'react';
 import Column from '../table/Column';
 
 type MyProps = {
-    rows:Array<any>
+    rows:Cell[][]
 };
 type Cell = {
     amount: number,

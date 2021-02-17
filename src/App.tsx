@@ -180,7 +180,7 @@ class Matrix extends React.Component<MyProps, MyState> {
       return;
     }
     let newArr = this.state.rows.slice();
-    let column = [];
+    let column: Cell[] = [];
     let lastRow = newArr[newArr.length - 1];
     let lastCellId = lastRow[lastRow.length - 1].id;
     for (let i = 0; i < newArr[0].length; i++) {
