@@ -49,10 +49,10 @@ class Matrix extends React.Component<MyProps, MyState> {
         if (event.type === 'click') {
           this.increaseCell.call(this, index);
         } else if (event.type === 'mouseover') {
-          let closest = this.findClosest.call(this, index);
+          let closest = this.findClosest.call(this, index);          
           if(closest){
-          this.highlightClosest.call(this, closest);
-          }
+             this.highlightClosest.call(this, closest);
+          };
         }
       } else if (collumnindex >= 0) {
         this.state.rows[collumnindex].forEach(function (elem:Cell) {
@@ -63,11 +63,11 @@ class Matrix extends React.Component<MyProps, MyState> {
     }
   }
 
-  findClosest(_id: number): Array<Cell> | undefined {
+  findClosest(_id : number): Array<Cell> | undefined {
     let data = this.state.rows.slice();
     let qty: number = typeof  Number(this.state.closest) === "number" ?  Number(this.state.closest): 0;
     let arrGeneral: Array<Cell>= [];
-    let  result:Array<Cell>;
+    let  result:Array<Cell> = [];
     if (!qty) {
       return;
     }
@@ -101,10 +101,9 @@ class Matrix extends React.Component<MyProps, MyState> {
           } while (end > (arrGeneral.length - 1));
         }
         result = arrGeneral.slice(start, end);
-        return result;
       }
     })
-   
+    return result;
   }
  
   highlightClosest(closestArr:Array<Cell> | undefined) {
