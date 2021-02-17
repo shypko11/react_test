@@ -129,7 +129,7 @@ class Matrix extends React.Component<MyProps, MyState> {
     }
   }
 
-  offHints(callback: any):void {
+  offHints(callback?:(()=>void)):void {
     let table = this.state.rows;
     for (let i = 0; i < table.length; i++) {
       for (let j = 0; j < table[i].length; j++) {
@@ -228,7 +228,7 @@ class Matrix extends React.Component<MyProps, MyState> {
    
     this.setState({ rows: localRows });
     window.addEventListener("offHints",  () => {
-      this.offHints(false);
+      this.offHints();
     });
   }
 
