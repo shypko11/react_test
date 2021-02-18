@@ -13,12 +13,13 @@ type MyState = {
 };
 
 export type Cell = {
-  amount: number,
-  id:number,
-  lighted:boolean,
-  percent: string,
-  showPercent: boolean
+  readonly  amount: number,
+  readonly id:number,
+  readonly lighted:boolean,
+  readonly percent: string,
+  readonly showPercent: boolean
 };
+
 type Data_attributes = {
   collumnindex?:number,
   index?: number
@@ -55,10 +56,14 @@ class Matrix extends React.Component<MyProps, MyState> {
           };
         }
       } else if (collumnindex >= 0) {
-        this.state.rows[collumnindex].forEach(function (elem:Cell) {
-          elem.showPercent = true;
+        let newArr = this.state.rows;
+        newArr[collumnindex].forEach(function (elem) {
+          elem = {
+            ...elem,
+            showPercent: true
+          }
         });
-        this.setState({ rows: this.state.rows })
+        this.setState({ rows: newArr })
       }
     }
   }
@@ -110,18 +115,21 @@ class Matrix extends React.Component<MyProps, MyState> {
     if (closestArr) {
       let self = this;
       this.offHints(function () {
-        let newArr = self.state.rows.slice();
+        let newArr = self.state.rows;
         closestArr.forEach(function (elem) {
-          for (let i = 0; i < newArr.length; i++) {
-            newArr[i].forEach(function (cell: Cell) {
-              if (!cell || !elem) {
+          newArr.forEach(function (cellsArr){
+            for (let i = 0; i < cellsArr.length; i++){
+              if (!cellsArr[i] || !elem) {
                 return;
               }
-              if (cell.id === elem.id) {
-                cell.lighted = true;
+              if (cellsArr[i].id === elem.id) {
+                 cellsArr[i] = {
+                 ...cellsArr[i],
+                 lighted: true
+                 };
               }
-            });
-          }
+            }
+          });
         });
         self.setState({ rows: newArr });
       });
@@ -132,8 +140,12 @@ class Matrix extends React.Component<MyProps, MyState> {
     let table = this.state.rows;
     for (let i = 0; i < table.length; i++) {
       for (let j = 0; j < table[i].length; j++) {
-        table[i][j].lighted = false;
-        table[i][j].showPercent = false;
+        table[i][j] = {
+           ...table[i][j],
+           lighted: false,
+           showPercent: false
+        }
+       
       }
     }
     this.setState({ rows: table });
@@ -141,12 +153,15 @@ class Matrix extends React.Component<MyProps, MyState> {
   }
 
   increaseCell(_id: number) {
-    let arr = this.state.rows.slice();
+    let arr = this.state.rows;
     arr.forEach(function (elem) {
       for (let i = 0; i < elem.length; i++) {
         if (elem[i].id === Number(_id)) {
-          elem[i].amount++;
-          elem[i].lighted = true;
+          elem[i] = {
+            ...elem[i], 
+            amount: elem[i].amount + 1,
+            lighted: true
+          }
           break;
         }
       }
