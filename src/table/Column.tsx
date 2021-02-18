@@ -1,16 +1,11 @@
 import React from 'react';
+import type { Cell } from '../App';
+
 interface MyProps {
     data:Cell[],
     collIndex: number,
     rows:Cell[][]
 };
-type Cell = {
-    amount: number,
-    id:number,
-    lighted:boolean,
-    percent: string,
-    showPercent: boolean
-  };
 
 class Column extends React.Component<MyProps, {}> {
    

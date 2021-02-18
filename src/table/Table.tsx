@@ -1,15 +1,9 @@
 import React from 'react';
 import Column from '../table/Column';
+import type { Cell } from '../App';
 
 type MyProps = {
     rows:Cell[][]
-};
-type Cell = {
-    amount: number,
-    id:number,
-    lighted:boolean,
-    percent: string,
-    showPercent: boolean
 };
 
 class Table extends React.Component<MyProps, {}> {

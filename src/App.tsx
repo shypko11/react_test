@@ -12,7 +12,7 @@ type MyState = {
   y?:number
 };
 
-type Cell = {
+export type Cell = {
   amount: number,
   id:number,
   lighted:boolean,
