@@ -1,29 +1,28 @@
-import React from 'react';
-import Table from './table/Table';
+import React from "react";
+import Table from "./table/Table";
 
-type MyProps = {
-};
+type MyProps = {};
 
 type MyState = {
-  rows:Cell[][],
-  oldRows:Cell[][],
-  closest: string | number,
-  x?:number,
-  y?:number
+  rows: Cell[][];
+  oldRows: Cell[][];
+  closest: string | number;
+  x?: number;
+  y?: number;
 };
 
 export type Cell = {
-  readonly  amount: number,
-  readonly id:number,
-  readonly lighted:boolean,
-  readonly percent: string,
-  readonly showPercent: boolean
+  readonly amount: number;
+  readonly id: number;
+  readonly lighted: boolean;
+  readonly percent: string;
+  readonly showPercent: boolean;
 };
 
 type Data_attributes = {
-  collumnindex?:number,
-  index?: number
-}
+  collumnindex?: number;
+  index?: number;
+};
 class Matrix extends React.Component<MyProps, MyState> {
   constructor(props: MyProps) {
     super(props);
@@ -38,22 +37,22 @@ class Matrix extends React.Component<MyProps, MyState> {
   }
 
   handleTableEvent(event: React.MouseEvent): void {
-    let collumnindex:number;
+    let collumnindex: number;
     let index: number;
     let data_attributes: Data_attributes;
-    let  target = event.target as HTMLElement;
-    if (target && target.tagName  === 'TH' ) {
-        data_attributes = target.dataset;
-        collumnindex = data_attributes.collumnindex ? Number(data_attributes.collumnindex) : -1;
-        index = data_attributes.index ?  Number(data_attributes.index) : -1;
+    let target = event.target as HTMLElement;
+    if (target && target.tagName === "TH") {
+      data_attributes = target.dataset;
+      collumnindex = data_attributes.collumnindex ? Number(data_attributes.collumnindex) : -1;
+      index = data_attributes.index ? Number(data_attributes.index) : -1;
       if (index >= 0) {
-        if (event.type === 'click') {
+        if (event.type === "click") {
           this.increaseCell.call(this, index);
-        } else if (event.type === 'mouseover') {
-          let closest = this.findClosest.call(this, index);          
-          if(closest){
-             this.highlightClosest.call(this, closest);
-          };
+        } else if (event.type === "mouseover") {
+          let closest = this.findClosest.call(this, index);
+          if (closest) {
+            this.highlightClosest.call(this, closest);
+          }
         }
       } else if (collumnindex >= 0) {
         let newArr = this.state.rows;
@@ -61,18 +60,18 @@ class Matrix extends React.Component<MyProps, MyState> {
           elem = {
             ...elem,
             showPercent: true
-          }
+          };
         });
-        this.setState({ rows: newArr })
+        this.setState({ rows: newArr });
       }
     }
   }
 
-  findClosest(_id : number): Array<Cell> | undefined {
+  findClosest(_id: number): Array<Cell> | undefined {
     let data = this.state.rows.slice();
-    let qty: number = typeof  Number(this.state.closest) === "number" ?  Number(this.state.closest): 0;
-    let arrGeneral: Array<Cell>= [];
-    let  result:Array<Cell> = [];
+    let qty: number = typeof Number(this.state.closest) === "number" ? Number(this.state.closest) : 0;
+    let arrGeneral: Array<Cell> = [];
+    let result: Array<Cell> = [];
     if (!qty) {
       return;
     }
@@ -83,50 +82,50 @@ class Matrix extends React.Component<MyProps, MyState> {
       qty = arrGeneral.length;
     }
     function sortByAmmount(arr: Array<Cell>) {
-      arr.sort((a, b) => a.amount > b.amount ? 1 : -1);
+      arr.sort((a, b) => (a.amount > b.amount ? 1 : -1));
     }
     sortByAmmount(arrGeneral);
 
     arrGeneral.forEach(function (elem, index) {
       if (elem.id === _id) {
-        let start = Math.floor(index - ((qty + 1) / 2));
-        let end = Math.floor(index + ((qty + 1) / 2));
+        let start = Math.floor(index - (qty + 1) / 2);
+        let end = Math.floor(index + (qty + 1) / 2);
         if (start < 0) {
           do {
             start += 1;
             end += 1;
           } while (start < 0);
-        } else if (end > (arrGeneral.length - 1)) {
+        } else if (end > arrGeneral.length - 1) {
           do {
             if (start === 0) {
               break;
             }
             start -= 1;
             end -= 1;
-          } while (end > (arrGeneral.length - 1));
+          } while (end > arrGeneral.length - 1);
         }
         result = arrGeneral.slice(start, end);
       }
-    })
+    });
     return result;
   }
- 
-  highlightClosest(closestArr:Array<Cell> | undefined) {
+
+  highlightClosest(closestArr: Array<Cell> | undefined) {
     if (closestArr) {
       let self = this;
       this.offHints(function () {
         let newArr = self.state.rows;
         closestArr.forEach(function (elem) {
-          newArr.forEach(function (cellsArr){
-            for (let i = 0; i < cellsArr.length; i++){
+          newArr.forEach(function (cellsArr) {
+            for (let i = 0; i < cellsArr.length; i++) {
               if (!cellsArr[i] || !elem) {
                 return;
               }
               if (cellsArr[i].id === elem.id) {
-                 cellsArr[i] = {
-                 ...cellsArr[i],
-                 lighted: true
-                 };
+                cellsArr[i] = {
+                  ...cellsArr[i],
+                  lighted: true
+                };
               }
             }
           });
@@ -136,16 +135,15 @@ class Matrix extends React.Component<MyProps, MyState> {
     }
   }
 
-  offHints(callback?:(()=>void)):void {
+  offHints(callback?: () => void): void {
     let table = this.state.rows;
     for (let i = 0; i < table.length; i++) {
       for (let j = 0; j < table[i].length; j++) {
         table[i][j] = {
-           ...table[i][j],
-           lighted: false,
-           showPercent: false
-        }
-       
+          ...table[i][j],
+          lighted: false,
+          showPercent: false
+        };
       }
     }
     this.setState({ rows: table });
@@ -158,10 +156,10 @@ class Matrix extends React.Component<MyProps, MyState> {
       for (let i = 0; i < elem.length; i++) {
         if (elem[i].id === Number(_id)) {
           elem[i] = {
-            ...elem[i], 
+            ...elem[i],
             amount: elem[i].amount + 1,
             lighted: true
-          }
+          };
           break;
         }
       }
@@ -171,9 +169,9 @@ class Matrix extends React.Component<MyProps, MyState> {
 
   handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     // let  target = event.target as HTMLInputElement;
-    if (event.target.name === 'x') {
+    if (event.target.name === "x") {
       this.setState({ x: Number(event.target.value) });
-    } else if (event.target.name === 'y') {
+    } else if (event.target.name === "y") {
       this.setState({ y: Number(event.target.value) });
     } else {
       this.setState({ closest: Number(event.target.value) });
@@ -201,9 +199,9 @@ class Matrix extends React.Component<MyProps, MyState> {
       let value = this.randomNumber(999, 100);
       column[i] = {
         id: ++lastCellId,
-        amount: value, 
-        lighted:false,
-        percent: '',
+        amount: value,
+        lighted: false,
+        percent: "",
         showPercent: false
       };
     }
@@ -213,11 +211,11 @@ class Matrix extends React.Component<MyProps, MyState> {
 
   createMatrix(event: React.FormEvent) {
     event.preventDefault();
-    const y  = this.state.y;
+    const y = this.state.y;
     const x = this.state.x;
     let localRows = [];
     let counter = 0;
-    if(x && y){
+    if (x && y) {
       for (let i = 0; i < x; i++) {
         let sum = 0;
         let column = [];
@@ -227,31 +225,29 @@ class Matrix extends React.Component<MyProps, MyState> {
             id: counter++,
             amount: value,
             lighted: false,
-            percent: '',
+            percent: "",
             showPercent: false
           };
           sum += value;
         }
         column.forEach(function (element) {
-          let perc = element.amount / sum * 100;
+          let perc = (element.amount / sum) * 100;
           element.percent = Math.round(perc) + "%";
-        })
+        });
         localRows.push(column);
       }
     }
-   
+
     this.setState({ rows: localRows });
-    window.addEventListener("offHints",  () => {
+    window.addEventListener("offHints", () => {
       this.offHints();
     });
   }
-
 
   render() {
     return (
       <div>
         <div id="form_wrap">
-
           <form onSubmit={this.createMatrix}>
             <label>
               <span style={{ display: "block" }}>Create Matrix</span>
@@ -260,22 +256,31 @@ class Matrix extends React.Component<MyProps, MyState> {
               <span>Columns:</span>
               <input type="number" name="y" onChange={this.handleChange} />
               <span>Amount closest numbers:</span>
-              <input type="number" name="closest" onChange={this.handleChange} />
+              <input
+                type="number"
+                name="closest"
+                onChange={this.handleChange}
+              />
             </label>
             <input className="button" type="submit" value="Create" />
           </form>
-          <button onClick={this.removeLine} className="button">Remove line</button>
-          <button onClick={this.addLine} className="button">Add line</button>
+          <button onClick={this.removeLine} className="button">
+            Remove line
+          </button>
+          <button onClick={this.addLine} className="button">
+            Add line
+          </button>
         </div>
-        <div className="table_wrap" onClick={this.handleTableEvent} onMouseOver={this.handleTableEvent} >
+        <div
+          className="table_wrap"
+          onClick={this.handleTableEvent}
+          onMouseOver={this.handleTableEvent}
+        >
           <Table rows={this.state.rows} />
         </div>
       </div>
     );
   }
 }
-
-
-
 
 export default Matrix;
