@@ -12,6 +12,7 @@
     "@types/react-dom": "17.0.1",
     "eslint-config-memcrab": "1.0.3",
     "flow-coverage-report": "0.8.0",
+    "jsx-node": "0.3.1",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-scripts": "4.0.2",
@@ -24,6 +25,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "startserver": "ts-node  ./server/server",
     "ts-coverage": "typescript-coverage-report"
   },
   "eslintConfig": {
@@ -45,6 +47,10 @@
     ]
   },
   "devDependencies": {
-    "prettier": "2.2.1"
+    "@babel/core": "7.12.17",
+    "@babel/node": "7.12.17",
+    "@babel/plugin-syntax-dynamic-import": "7.8.3",
+    "prettier": "2.2.1",
+    "ts-node": "9.1.1"
   }
 }

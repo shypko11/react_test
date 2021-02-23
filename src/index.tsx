@@ -4,7 +4,7 @@ import './index.css';
 import Matrix from './App';
 import reportWebVitals from './reportWebVitals';
 
-ReactDOM.render(
+ReactDOM.hydrate(
   <React.StrictMode>
     <Matrix />
   </React.StrictMode>,
