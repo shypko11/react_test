@@ -13,6 +13,7 @@
     "eslint-config-memcrab": "1.0.3",
     "flow-coverage-report": "0.8.0",
     "jsx-node": "0.3.1",
+    "qs": "6.9.6",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-scripts": "4.0.2",

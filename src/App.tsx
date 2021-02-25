@@ -1,10 +1,18 @@
 import React from "react";
 import Table from "./table/Table";
 
-type MyProps = {};
+type Data = {
+  x: number;
+  y: number;
+  closest: number;
+  tableData?: Cell[][] | undefined
+};
+type MyProps = {
+ data:Data;
+};
 
 type MyState = {
-  rows: Cell[][];
+  rows: Cell[][] | undefined;
   oldRows: Cell[][];
   closest: string | number;
   x?: number;
@@ -26,109 +34,122 @@ type Data_attributes = {
 class Matrix extends React.Component<MyProps, MyState> {
   constructor(props: MyProps) {
     super(props);
-    this.state = { rows: [], oldRows: [], closest: 0 };
+    if(props.data){
+      this.state = { rows: props.data.tableData, oldRows: [], closest: props.data.closest, x: props.data.x, y: props.data.y };
+    }else{
+      this.state = { rows: [], oldRows: [], closest: 0, x: 0, y: 0 };
+    }
     this.handleChange = this.handleChange.bind(this);
     this.createMatrix = this.createMatrix.bind(this);
     this.removeLine = this.removeLine.bind(this);
     this.addLine = this.addLine.bind(this);
     this.handleTableEvent = this.handleTableEvent.bind(this);
-    this.offHints = this.offHints.bind(this);
-    //ffff
+    this.offHints = this.offHints.bind(this);    
   }
 
   handleTableEvent(event: React.MouseEvent): void {
-    let collumnindex: number;
-    let index: number;
-    let data_attributes: Data_attributes;
-    let target = event.target as HTMLElement;
-    if (target && target.tagName === "TH") {
-      data_attributes = target.dataset;
-      collumnindex = data_attributes.collumnindex ? Number(data_attributes.collumnindex) : -1;
-      index = data_attributes.index ? Number(data_attributes.index) : -1;
-      if (index >= 0) {
-        if (event.type === "click") {
-          this.increaseCell.call(this, index);
-        } else if (event.type === "mouseover") {
-          let closest = this.findClosest.call(this, index);
-          if (closest) {
-            this.highlightClosest.call(this, closest);
+    if(this.state.rows){
+      let collumnindex: number;
+      let index: number;
+      let data_attributes: Data_attributes;
+      let target = event.target as HTMLElement;
+      if (target && target.tagName === "TH") {
+        data_attributes = target.dataset;
+        collumnindex = data_attributes.collumnindex ? Number(data_attributes.collumnindex) : -1;
+        index = data_attributes.index ? Number(data_attributes.index) : -1;
+        if (index >= 0) {
+          if (event.type === "click") {
+            this.increaseCell.call(this, index);
+          } else if (event.type === "mouseover") {
+            let closest = this.findClosest.call(this, index);
+            if (closest) {
+              this.highlightClosest.call(this, closest);
+            }
           }
+        } else if (collumnindex >= 0) {
+          let newArr = this.state.rows;
+          let row = this.state.rows[collumnindex]
+          for(let i = 0; i < row.length; i++){
+            row[i] = {
+              ...row[i],
+              showPercent: true
+            }
+          }
+          this.setState({ rows: newArr });
         }
-      } else if (collumnindex >= 0) {
-        let newArr = this.state.rows;
-        newArr[collumnindex].forEach(function (elem) {
-          elem = {
-            ...elem,
-            showPercent: true
-          };
-        });
-        this.setState({ rows: newArr });
       }
     }
+    
   }
-
+  
   findClosest(_id: number): Array<Cell> | undefined {
-    let data = this.state.rows.slice();
-    let qty: number = typeof Number(this.state.closest) === "number" ? Number(this.state.closest) : 0;
-    let arrGeneral: Array<Cell> = [];
-    let result: Array<Cell> = [];
-    if (!qty) {
-      return;
-    }
-    for (let i = 0; i < data.length; i++) {
-      arrGeneral = arrGeneral.concat(data[i]);
-    }
-    if (qty > arrGeneral.length) {
-      qty = arrGeneral.length;
+    if(this.state.rows){
+      let data = this.state.rows.slice();
+      let qty: number = typeof Number(this.state.closest) === "number" ? Number(this.state.closest) : 0;
+      let arrGeneral: Array<Cell> = [];
+      let result: Array<Cell> = [];
+      if (!qty) {
+        return;
+      }
+      for (let i = 0; i < data.length; i++) {
+        arrGeneral = arrGeneral.concat(data[i]);
+      }
+      if (qty > arrGeneral.length) {
+        qty = arrGeneral.length;
+      }
+      
+      sortByAmmount(arrGeneral);
+  
+      arrGeneral.forEach(function (elem, index) {
+        if (elem.id === _id) {
+          let start = Math.floor(index - (qty + 1) / 2);
+          let end = Math.floor(index + (qty + 1) / 2);
+          if (start < 0) {
+            do {
+              start += 1;
+              end += 1;
+            } while (start < 0);
+          } else if (end > arrGeneral.length - 1) {
+            do {
+              if (start === 0) {
+                break;
+              }
+              start -= 1;
+              end -= 1;
+            } while (end > arrGeneral.length - 1);
+          }
+          result = arrGeneral.slice(start, end);
+        }
+      });
+      return result;
     }
     function sortByAmmount(arr: Array<Cell>) {
       arr.sort((a, b) => (a.amount > b.amount ? 1 : -1));
     }
-    sortByAmmount(arrGeneral);
-
-    arrGeneral.forEach(function (elem, index) {
-      if (elem.id === _id) {
-        let start = Math.floor(index - (qty + 1) / 2);
-        let end = Math.floor(index + (qty + 1) / 2);
-        if (start < 0) {
-          do {
-            start += 1;
-            end += 1;
-          } while (start < 0);
-        } else if (end > arrGeneral.length - 1) {
-          do {
-            if (start === 0) {
-              break;
-            }
-            start -= 1;
-            end -= 1;
-          } while (end > arrGeneral.length - 1);
-        }
-        result = arrGeneral.slice(start, end);
-      }
-    });
-    return result;
   }
 
   highlightClosest(closestArr: Array<Cell> | undefined) {
+    
     if (closestArr) {
       let self = this;
       this.offHints(function () {
         let newArr = self.state.rows;
         closestArr.forEach(function (elem) {
-          newArr.forEach(function (cellsArr) {
-            for (let i = 0; i < cellsArr.length; i++) {
-              if (!cellsArr[i] || !elem) {
-                return;
+          if(newArr){
+            newArr.forEach(function (cellsArr) {
+              for (let i = 0; i < cellsArr.length; i++) {
+                if (!cellsArr[i] || !elem) {
+                  return;
+                }
+                if (cellsArr[i].id === elem.id) {
+                  cellsArr[i] = {
+                    ...cellsArr[i],
+                    lighted: true
+                  };
+                }
               }
-              if (cellsArr[i].id === elem.id) {
-                cellsArr[i] = {
-                  ...cellsArr[i],
-                  lighted: true
-                };
-              }
-            }
-          });
+            });
+          }
         });
         self.setState({ rows: newArr });
       });
@@ -137,34 +158,38 @@ class Matrix extends React.Component<MyProps, MyState> {
 
   offHints(callback?: () => void): void {
     let table = this.state.rows;
-    for (let i = 0; i < table.length; i++) {
-      for (let j = 0; j < table[i].length; j++) {
-        table[i][j] = {
-          ...table[i][j],
-          lighted: false,
-          showPercent: false
-        };
+    if(table){
+      for (let i = 0; i < table.length; i++) {
+        for (let j = 0; j < table[i].length; j++) {
+          table[i][j] = {
+            ...table[i][j],
+            lighted: false,
+            showPercent: false
+          };
+        }
       }
+      this.setState({ rows: table });
+      callback && callback();
     }
-    this.setState({ rows: table });
-    callback && callback();
   }
 
   increaseCell(_id: number) {
     let arr = this.state.rows;
-    arr.forEach(function (elem) {
-      for (let i = 0; i < elem.length; i++) {
-        if (elem[i].id === Number(_id)) {
-          elem[i] = {
-            ...elem[i],
-            amount: elem[i].amount + 1,
-            lighted: true
-          };
-          break;
+    if(arr){
+      arr.forEach(function (elem) {
+        for (let i = 0; i < elem.length; i++) {
+          if (elem[i].id === Number(_id)) {
+            elem[i] = {
+              ...elem[i],
+              amount: elem[i].amount + 1,
+              lighted: true
+            };
+            break;
+          }
         }
-      }
-    });
-    this.setState({ rows: arr });
+      });
+      this.setState({ rows: arr });
+    }
   }
 
   handleChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -183,8 +208,11 @@ class Matrix extends React.Component<MyProps, MyState> {
   }
 
   removeLine() {
-    let newArr = this.state.rows.slice(0, this.state.rows.length - 1);
-    this.setState({ rows: newArr });
+    if(this.state.rows){
+      let newArr = this.state.rows.slice(0, this.state.rows.length - 1);
+      this.setState({ rows: newArr });
+    }
+   
   }
 
   addLine() {
@@ -209,8 +237,11 @@ class Matrix extends React.Component<MyProps, MyState> {
     this.setState({ rows: newArr });
   }
 
-  createMatrix(event: React.FormEvent) {
-    event.preventDefault();
+  createMatrix(event?: React.FormEvent) {
+    event && event.preventDefault();
+    if(!this.state.x && !this.state.y){
+      return;
+    }
     const y = this.state.y;
     const x = this.state.x;
     let localRows = [];
@@ -230,23 +261,40 @@ class Matrix extends React.Component<MyProps, MyState> {
           };
           sum += value;
         }
-        column.forEach(function (element) {
-          let perc = (element.amount / sum) * 100;
-          element.percent = Math.round(perc) + "%";
-        });
+
+        for(let k = 0; k < column.length; k++){
+          let perc: number = (column[k].amount / sum) * 100;
+          let percentValue: string = Math.round(perc) + "%";
+          column[k] = {
+            ...column[k],
+            percent: percentValue
+          }
+        }
+       
         localRows.push(column);
       }
     }
 
     this.setState({ rows: localRows });
-    window.addEventListener("offHints", () => {
-      this.offHints();
-    });
+   
   }
 
   render() {
-    return (
-      <div>
+    // (globalThis as any).addEventListener("offHints", () => {
+    //   this.offHints();
+    // });
+    if (this.state.rows && this.state.rows.length > 0){
+      return(
+      <div
+         className="table_wrap"
+         onClick={this.handleTableEvent}
+         onMouseOver={this.handleTableEvent}
+      >
+      <Table rows={this.state.rows} />
+    </div>
+    );
+    } else {
+      return (
         <div id="form_wrap">
           <form onSubmit={this.createMatrix}>
             <label>
@@ -271,15 +319,8 @@ class Matrix extends React.Component<MyProps, MyState> {
             Add line
           </button>
         </div>
-        <div
-          className="table_wrap"
-          onClick={this.handleTableEvent}
-          onMouseOver={this.handleTableEvent}
-        >
-          <Table rows={this.state.rows} />
-        </div>
-      </div>
-    );
+    );}
+    
   }
 }
 

@@ -3,7 +3,7 @@ import Column from "../table/Column";
 import type { Cell } from "../App";
 
 type MyProps = {
-  rows: Cell[][];
+  rows: Cell[][] | undefined;
 };
 
 class Table extends React.Component<MyProps, {}> {
@@ -30,30 +30,42 @@ class Table extends React.Component<MyProps, {}> {
   }
 
   render() {
-    let tableRows = [];
-    let average = this.generateAverageValues(this.props.rows);
-    let counter = 0;
-    for (let i = 0; i < this.props.rows.length; i++) {
-      let tr = (
-        <tr>
-          <Column
-            data={this.props.rows[i]}
-            rows={this.props.rows}
-            collIndex={counter++}
-          />
-        </tr>
+    if( this.props.rows){
+      let tableRows = [];
+      let average = this.generateAverageValues(this.props.rows);
+      let counter = 0;
+      
+      for (let i = 0; i < this.props.rows.length; i++) {
+        let tr = (
+          <tr>
+            <Column
+              data={this.props.rows[i]}
+              rows={this.props.rows}
+              collIndex={counter++}
+            />
+          </tr>
+        );
+        tableRows.push(tr);
+      }
+  
+      return (
+        <table onMouseLeave={this.offAllLight}>
+          <tbody>
+            {tableRows}
+            <tr>{average}</tr>
+          </tbody>
+        </table>
       );
-      tableRows.push(tr);
+    }else{
+      return (
+        <table>
+          <tbody>
+            <tr></tr>
+          </tbody>
+        </table>
+      );
     }
-
-    return (
-      <table onMouseLeave={this.offAllLight}>
-        <thead>
-          {tableRows}
-          <tr>{average}</tr>
-        </thead>
-      </table>
-    );
+    
   }
 }
 

@@ -18,16 +18,14 @@ class Column extends React.Component<MyProps, {}> {
     let sum = 0;
     for (let i = 0; i < this.props.data.length; i++) {
       let cellData: Cell = this.props.data[i];
-      let inner: number = cellData.showPercent ? Number(cellData.percent) : cellData.amount;
+      let inner: number | string = cellData.showPercent ? cellData.percent : cellData.amount;
       let heightPercent: string = cellData.showPercent ? cellData.percent : "0";
       sum += cellData.amount;
       let columns = (
         <th
           data-index={cellData.id}
           className={cellData.lighted ? "light" : "base"}
-        >
-          {inner}
-          <span className={"percent"} style={{ height: heightPercent }}></span>
+        >{inner}<span className={"percent"} style={{ height: heightPercent }}></span>
         </th>
       );
       tableCol.push(columns);
@@ -36,8 +34,7 @@ class Column extends React.Component<MyProps, {}> {
       <th
         data-collumnindex={this.props.collIndex}
         onMouseLeave={this.percentOff}
-      >
-        {sum}
+      >{sum}
       </th>
     );
     return tableCol;
