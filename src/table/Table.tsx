@@ -23,7 +23,7 @@ class Table extends React.Component<MyProps, {}> {
       for (let i = 0; i < rows.length; i++) {
         value += rows[i][j].amount;
       }
-      arrAverageValues.push(<th>{Math.round(value / rows.length)}</th>);
+      arrAverageValues.push(<th key={Math.random().toString()} >{Math.round(value / rows.length)}</th>);
       value = 0;
     }
     return arrAverageValues;
@@ -37,7 +37,7 @@ class Table extends React.Component<MyProps, {}> {
       
       for (let i = 0; i < this.props.rows.length; i++) {
         let tr = (
-          <tr>
+          <tr key={Math.random().toString()}>
             <Column
               data={this.props.rows[i]}
               rows={this.props.rows}
@@ -52,7 +52,7 @@ class Table extends React.Component<MyProps, {}> {
         <table onMouseLeave={this.offAllLight}>
           <tbody>
             {tableRows}
-            <tr>{average}</tr>
+            <tr key={"avarege"}>{average}</tr>
           </tbody>
         </table>
       );

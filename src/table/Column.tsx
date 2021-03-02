@@ -22,7 +22,7 @@ class Column extends React.Component<MyProps, {}> {
       let heightPercent: string = cellData.showPercent ? cellData.percent : "0";
       sum += cellData.amount;
       let columns = (
-        <th
+        <th key={Math.random().toString()}
           data-index={cellData.id}
           className={cellData.lighted ? "light" : "base"}
         >{inner}<span className={"percent"} style={{ height: heightPercent }}></span>
@@ -31,7 +31,8 @@ class Column extends React.Component<MyProps, {}> {
       tableCol.push(columns);
     }
     tableCol.push(
-      <th
+      <th key={Math.random().toString()}
+        className="sum"
         data-collumnindex={this.props.collIndex}
         onMouseLeave={this.percentOff}
       >{sum}
