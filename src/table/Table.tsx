@@ -20,10 +20,12 @@ class Table extends React.Component<MyProps, {}> {
     let arrAverageValues = [];
     let value = 0;
     for (let j = 0; j < cellsInRow; j++) {
+      let keyUnic;
       for (let i = 0; i < rows.length; i++) {
+        keyUnic = "average" +  i + j; 
         value += rows[i][j].amount;
       }
-      arrAverageValues.push(<th key={Math.random().toString()} >{Math.round(value / rows.length)}</th>);
+      arrAverageValues.push(<th key={keyUnic} >{Math.round(value / rows.length)}</th>);
       value = 0;
     }
     return arrAverageValues;
@@ -36,8 +38,9 @@ class Table extends React.Component<MyProps, {}> {
       let counter = 0;
       
       for (let i = 0; i < this.props.rows.length; i++) {
+      let keyUnic = "row" + i;
         let tr = (
-          <tr key={Math.random().toString()}>
+          <tr key={keyUnic}>
             <Column
               data={this.props.rows[i]}
               rows={this.props.rows}
@@ -52,7 +55,7 @@ class Table extends React.Component<MyProps, {}> {
         <table onMouseLeave={this.offAllLight}>
           <tbody>
             {tableRows}
-            <tr key={"avarege"}>{average}</tr>
+            <tr key={"avaregeRow"}>{average}</tr>
           </tbody>
         </table>
       );

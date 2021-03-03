@@ -21,8 +21,9 @@ class Column extends React.Component<MyProps, {}> {
       let inner: number | string = cellData.showPercent ? cellData.percent : cellData.amount;
       let heightPercent: string = cellData.showPercent ? cellData.percent : "0";
       sum += cellData.amount;
+      let keyUnic = "cell" + this.props.collIndex + i;
       let columns = (
-        <th key={Math.random().toString()}
+        <th key={keyUnic}
           data-index={cellData.id}
           className={cellData.lighted ? "light" : "base"}
         >{inner}<span className={"percent"} style={{ height: heightPercent }}></span>
@@ -30,8 +31,9 @@ class Column extends React.Component<MyProps, {}> {
       );
       tableCol.push(columns);
     }
+    let keyUnic = "sum" + this.props.collIndex;
     tableCol.push(
-      <th key={Math.random().toString()}
+      <th key={keyUnic}
         className="sum"
         data-collumnindex={this.props.collIndex}
         onMouseLeave={this.percentOff}
