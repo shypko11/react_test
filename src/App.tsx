@@ -26,6 +26,8 @@ export type Cell = {
   readonly lighted: boolean;
   readonly percent: string;
   readonly showPercent: boolean;
+  readonly x?: number;
+  readonly y?: number;
 };
 
 type Data_attributes = {
@@ -45,7 +47,7 @@ class Matrix extends React.Component<MyProps, MyState> {
     this.removeLine = this.removeLine.bind(this);
     this.addLine = this.addLine.bind(this);
     this.handleTableEvent = this.handleTableEvent.bind(this);
-    this.offHints = this.offHints.bind(this);    
+    this.toggleHints = this.toggleHints.bind(this);    
   }
 
   handleTableEvent(event: React.MouseEvent): void {
@@ -64,7 +66,7 @@ class Matrix extends React.Component<MyProps, MyState> {
           } else if (event.type === "mouseover") {
             let closest = findClosest.call(this, index, this.state.rows, this.state.closest);
             if (closest) { 
-              this.highlightClosest.call(this, closest);
+              this.toggleHints.call(this, closest);
             }
           }
         } else if (collumnindex >= 0) {
@@ -80,41 +82,21 @@ class Matrix extends React.Component<MyProps, MyState> {
         }
       }
     }
-    
-  }
-  
-
-
-  highlightClosest(closestArr: Array<Cell> | undefined) {
-    if (closestArr) {
-      let self = this;
-      this.offHints(function () {
-        let newArr = self.state.rows;
-        closestArr.forEach(function (elem) {
-          if(newArr){
-            newArr.forEach(function (cellsArr) {
-              for (let i = 0; i < cellsArr.length; i++) {
-              
-                if (cellsArr[i].id === elem.id) {
-                  cellsArr[i] = {
-                    ...cellsArr[i],
-                    lighted: true
-                  };
-                }
-              }
-            });
-          }
-        });
-        self.setState({ rows: newArr });
-      });
-    }
   }
 
-  offHints(callback?: () => void): void {
+  toggleHints(arr?: Cell[]): void {
     let table = this.state.rows;
     if(table){
       for (let i = 0; i < table.length; i++) {
         for (let j = 0; j < table[i].length; j++) {
+          if(arr && arr.indexOf(table[i][j]) > -1){
+            table[i][j] = {
+              ...table[i][j],
+              lighted: true,
+              showPercent: false
+            };
+            continue;
+          }
           table[i][j] = {
             ...table[i][j],
             lighted: false,
@@ -123,7 +105,6 @@ class Matrix extends React.Component<MyProps, MyState> {
         }
       }
       this.setState({ rows: table });
-      callback && callback();
     }
   }
 
@@ -207,7 +188,9 @@ class Matrix extends React.Component<MyProps, MyState> {
             amount: value,
             lighted: false,
             percent: "",
-            showPercent: false
+            showPercent: false,
+            x: j,
+            y: i
           };
           sum += value;
         }
@@ -230,8 +213,8 @@ class Matrix extends React.Component<MyProps, MyState> {
   }
 
   render() {
-    // (globalThis as any).addEventListener("offHints", () => {
-    //   this.offHints();
+    // (globalThis as any).addEventListener("toggleHints", () => {
+    //   this.toggleHints();
     // });
     // if (this.state.rows && this.state.rows.length > 0){
     //   return(
