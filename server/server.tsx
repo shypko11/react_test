@@ -2,10 +2,10 @@
 import React from "react";
 import Matrix from '../src/App';
 import {renderToString} from 'react-dom/server';
-const http = require('http');
+import { createServer, IncomingMessage, ServerResponse } from 'http';
 const qs = require('qs');
  
-http.createServer(function(request:any, response: any){
+  createServer(function(request: IncomingMessage, response: ServerResponse){
     let rowsData;
     let urlParams;
     let globalParams;
@@ -212,7 +212,9 @@ function generateTable(x: number, y: number){
             amount: value,
             lighted: false,
             percent: "",
-            showPercent: false
+            showPercent: false,
+            x: j,
+            y: i
           };
           sum += value;
         }
