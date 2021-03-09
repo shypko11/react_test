@@ -6,111 +6,169 @@ type Data = {
   x: number;
   y: number;
   closest: number;
-  tableData?: Cell[][] | undefined
+  tableData?: CellType[][] | undefined;
 };
 type MyProps = {
- data?:Data;
+  data?: Data;
 };
 
 type MyState = {
-  rows: Cell[][] | undefined;
-  oldRows: Cell[][];
+  rows: CellType[][] | undefined;
+  oldRows: CellType[][];
   closest: number;
   x?: number;
   y?: number;
 };
 
-export type Cell = {
+export type CellType = {
   readonly amount: number;
   readonly id: number;
   readonly lighted: boolean;
   readonly percent: string;
   readonly showPercent: boolean;
-  readonly x?: number;
-  readonly y?: number;
+  readonly x: number;
+  readonly y: number;
 };
 
 type Data_attributes = {
   collumnindex?: number;
   index?: number;
 };
+
 class Matrix extends React.Component<MyProps, MyState> {
+  lightingCells: number[];
   constructor(props: MyProps) {
     super(props);
-    if(props.data){
-      this.state = { rows: props.data.tableData, oldRows: [], closest: props.data.closest, x: props.data.x, y: props.data.y };
-    }else{
+    if (props.data) {
+      this.state = {
+        rows: props.data.tableData,
+        oldRows: [],
+        closest: props.data.closest,
+        x: props.data.x,
+        y: props.data.y,
+      };
+    } else {
       this.state = { rows: [], oldRows: [], closest: 0, x: 0, y: 0 };
     }
+    this.lightingCells = [];
     this.handleChange = this.handleChange.bind(this);
     this.createMatrix = this.createMatrix.bind(this);
     this.removeLine = this.removeLine.bind(this);
     this.addLine = this.addLine.bind(this);
     this.handleTableEvent = this.handleTableEvent.bind(this);
-    this.toggleHints = this.toggleHints.bind(this);    
+    this.toggleHints = this.toggleHints.bind(this);
   }
 
   handleTableEvent(event: React.MouseEvent): void {
-    if(this.state.rows){
+    if (this.state.rows) {
       let collumnindex: number;
       let index: number;
       let data_attributes: Data_attributes;
       let target = event.target as HTMLElement;
       if (target && target.tagName === "TH") {
         data_attributes = target.dataset;
-        collumnindex = data_attributes.collumnindex ? Number(data_attributes.collumnindex) : -1;
-        index = data_attributes.index ? Number(data_attributes.index) : -1;
+        collumnindex = data_attributes.collumnindex
+          ? (data_attributes.collumnindex -0)
+          : -1;
+        index = data_attributes.index ? (data_attributes.index -0) : -1;
         if (index >= 0) {
-          if (event.type === "click") { 
+          if (event.type === "click") {
             this.increaseCell.call(this, index);
           } else if (event.type === "mouseover") {
-            let closest = findClosest.call(this, index, this.state.rows, this.state.closest);
-            if (closest) { 
+            let closest = findClosest.call(
+              this,
+              index,
+              this.state.rows,
+              this.state.closest
+            );
+            if (closest) {
               this.toggleHints.call(this, closest);
             }
           }
         } else if (collumnindex >= 0) {
-          let newArr = this.state.rows;
-          let row = this.state.rows[collumnindex]
-          for(let i = 0; i < row.length; i++){
-            row[i] = {
-              ...row[i],
-              showPercent: true
-            }
+          let stateRows = this.state.rows;
+          let table;
+          if (stateRows) {
+            table = stateRows?.map((row, i) => {
+              return row.map((cell, j) => {
+                if (i === collumnindex) {
+                  cell = {
+                    ...cell,
+                    lighted: false,
+                    showPercent: true,
+                  };
+                } else if (cell.lighted || cell.showPercent) {
+                  cell = {
+                    ...cell,
+                    lighted: false,
+                    showPercent: false,
+                  };
+                }
+                return cell;
+              });
+            });
+            this.setState({ rows: table });
           }
-          this.setState({ rows: newArr });
+          // let newArr = this.state.rows;
+          // let row = this.state.rows[collumnindex]
+          // for(let i = 0; i < row.length; i++){
+          //   row[i] = {
+          //     ...row[i],
+          //     showPercent: true
+          //   }
+          // }
+          // this.setState({ rows: newArr });
         }
       }
     }
   }
 
-  toggleHints(arr?: Cell[]): void {
-    let table = this.state.rows;
-    if(table){
-      for (let i = 0; i < table.length; i++) {
-        for (let j = 0; j < table[i].length; j++) {
-          if(arr && arr.indexOf(table[i][j]) > -1){
-            table[i][j] = {
-              ...table[i][j],
-              lighted: true,
-              showPercent: false
-            };
-            continue;
-          }
-          table[i][j] = {
-            ...table[i][j],
-            lighted: false,
-            showPercent: false
-          };
+  toggleHints(arr?: CellType[]): void {
+  
+ 
+
+    let cordsY = arr?.map((elem) => {
+      return elem.y;
+    });
+    let offCords = this.lightingCells?.length > 0 ? this.lightingCells?.slice() : [];
+    this.lightingCells = [];
+    let table;
+    if (this.state.rows) {
+      let stateRows: CellType[][] = this.state.rows;
+      table = stateRows.map((row, i) => {
+        if (cordsY?.indexOf(i) !== -1 || offCords?.indexOf(i) !== -1) {
+          return row.map((cell, j) => {
+            if (arr && arr.indexOf(cell) !== -1) {
+              cell && this.lightingCells.push(cell.y);
+              cell = {
+                ...cell,
+                lighted: true,
+                showPercent: false,
+              };
+            } else if (cell.lighted || cell.showPercent) {
+              cell = {
+                ...cell,
+                lighted: false,
+                showPercent: false,
+              };
+            } else {
+              cell = stateRows[i][j];
+            }
+            return cell;
+          });
+        } else {
+          return stateRows[i];
         }
-      }
+      });
       this.setState({ rows: table });
     }
+
+  
   }
 
   increaseCell(_id: number) {
     let arr = this.state.rows;
-    if(arr){
+    if (arr) {
       arr.forEach(function (elem) {
         for (let i = 0; i < elem.length; i++) {
           if (elem[i].id === Number(_id)) {
@@ -139,11 +197,10 @@ class Matrix extends React.Component<MyProps, MyState> {
   }
 
   removeLine() {
-    if(this.state.rows){
+    if (this.state.rows) {
       let newArr = this.state.rows.slice(0, this.state.rows.length - 1);
       this.setState({ rows: newArr });
     }
-   
   }
 
   addLine() {
@@ -151,9 +208,10 @@ class Matrix extends React.Component<MyProps, MyState> {
       return;
     }
     let newArr = this.state.rows.slice();
-    let column: Cell[] = [];
+    let column: CellType[] = [];
     let lastRow = newArr[newArr.length - 1];
     let lastCellId = lastRow[lastRow.length - 1].id;
+    let newY = lastRow[lastRow.length - 1].y;
     for (let i = 0; i < newArr[0].length; i++) {
       let value = randomNumber(999, 100);
       column[i] = {
@@ -161,7 +219,9 @@ class Matrix extends React.Component<MyProps, MyState> {
         amount: value,
         lighted: false,
         percent: "",
-        showPercent: false
+        showPercent: false,
+        y: newY,
+        x: i
       };
     }
     newArr.push(column);
@@ -170,7 +230,7 @@ class Matrix extends React.Component<MyProps, MyState> {
 
   createMatrix(event?: React.FormEvent) {
     event && event.preventDefault();
-    if(!this.state.x && !this.state.y){
+    if (!this.state.x && !this.state.y) {
       return;
     }
     const y = this.state.y;
@@ -195,21 +255,20 @@ class Matrix extends React.Component<MyProps, MyState> {
           sum += value;
         }
 
-        for(let k = 0; k < column.length; k++){
+        for (let k = 0; k < column.length; k++) {
           let perc: number = (column[k].amount / sum) * 100;
           let percentValue: string = Math.round(perc) + "%";
           column[k] = {
             ...column[k],
             percent: percentValue
-          }
+          };
         }
-       
+
         localRows.push(column);
       }
     }
 
     this.setState({ rows: localRows });
-   
   }
 
   render() {
@@ -218,43 +277,40 @@ class Matrix extends React.Component<MyProps, MyState> {
     // });
     // if (this.state.rows && this.state.rows.length > 0){
     //   return(
-     
+
     // );
     // } else {
-      return (
-        <div id="form_wrap">
-          <form  id="formZ" onSubmit={this.createMatrix}>
-            <label>
-              <span style={{ display: "block" }}>Create Matrix</span>
-              <span>Rows:</span>
-              <input type="number" name="x" onChange={this.handleChange} />
-              <span>Columns:</span>
-              <input type="number" name="y" onChange={this.handleChange} />
-              <span>Amount closest numbers:</span>
-              <input
-                type="number"
-                name="closest"
-                onChange={this.handleChange}
-              />
-            </label>
-            <input className="button" type="submit" value="Create" />
-          </form>
-          <button onClick={this.removeLine} className="button" id="removeButton">
-            Remove line
-          </button>
-          <button onClick={this.addLine} className="button" id="addButton">
-            Add line
-          </button>
-          <div
-            className="table_wrap"
-            onClick={this.handleTableEvent}
-            onMouseOver={this.handleTableEvent}
-          >
-            <Table rows={this.state.rows}/>
-          </div>
+    return (
+      <div id="form_wrap">
+        <form id="formZ" onSubmit={this.createMatrix}>
+          <label>
+            <span style={{ display: "block" }}>Create Matrix</span>
+            <span>Rows:</span>
+            <input type="number" name="x" onChange={this.handleChange} />
+            <span>Columns:</span>
+            <input type="number" name="y" onChange={this.handleChange} />
+            <span>Amount closest numbers:</span>
+            <input type="number" name="closest" onChange={this.handleChange} />
+          </label>
+          <input className="button" type="submit" value="Create" />
+        </form>
+        <button onClick={this.removeLine} className="button" id="removeButton">
+          Remove line
+        </button>
+        <button onClick={this.addLine} className="button" id="addButton">
+          Add line
+        </button>
+        <div
+          className="table_wrap"
+          onClick={this.handleTableEvent}
+          onMouseOver={this.handleTableEvent}
+        >
+          <Table rows={this.state.rows} />
         </div>
-    );}
-    
+      </div>
+    );
+  }
+
   // }
 }
 
