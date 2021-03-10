@@ -1,5 +1,6 @@
+import { type } from "node:os";
 import React from "react";
-import { findClosest, randomNumber } from "./general";
+import { convetID, findClosest, randomNumber } from "./general";
 import Table from "./table/Table";
 
 type Data = {
@@ -20,6 +21,10 @@ type MyState = {
   y?: number;
 };
 
+type Cords = {
+  x: number;
+  y: number;
+};
 export type CellType = {
   readonly amount: number;
   readonly id: number;
@@ -124,9 +129,6 @@ class Matrix extends React.Component<MyProps, MyState> {
   }
 
   toggleHints(arr?: CellType[]): void {
-  
- 
-
     let cordsY = arr?.map((elem) => {
       return elem.y;
     });
@@ -162,26 +164,41 @@ class Matrix extends React.Component<MyProps, MyState> {
       });
       this.setState({ rows: table });
     }
-
-  
   }
+
+
 
   increaseCell(_id: number) {
     let arr = this.state.rows;
     if (arr) {
-      arr.forEach(function (elem) {
-        for (let i = 0; i < elem.length; i++) {
-          if (elem[i].id === Number(_id)) {
-            elem[i] = {
-              ...elem[i],
-              amount: elem[i].amount + 1,
-              lighted: true
-            };
-            break;
-          }
+      let cords: Cords;
+      let rowLen = arr[0].length;
+      if (rowLen > _id) {
+        cords = {
+          x: _id,
+          y: 0,
+        };
+      } else {
+        cords = convetID(_id, rowLen);
+      }
+      let newArr = arr.map((row, i) => {
+        if (i !== cords.y && arr) {
+          return arr[i];
+        } else {
+          return row.map((cell, j) => {
+            if (j !== cords.x && arr) {
+              return arr[i][j];
+            } else {
+              cell = {
+                ...cell,
+                amount: cell.amount + 1
+              };
+              return cell;
+            }
+          });
         }
       });
-      this.setState({ rows: arr });
+      this.setState({ rows: newArr });
     }
   }
 

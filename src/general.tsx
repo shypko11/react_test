@@ -52,4 +52,12 @@ export function findClosest(_id: number, rows:CellType[][], closest: number): Ar
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-
+  export function  convetID(num: number, len: number) {
+    let x = num % len;
+    let y = Math.floor(num / len);
+    let result = {
+      x,
+      y,
+    };
+    return result;
+  }
