@@ -1,6 +1,8 @@
 import React from "react";
 import Column from "../table/Column";
 import type { CellType } from "../App";
+import style from "../styles/Table.module.css"
+
 
 type MyProps = {
   rows: CellType[][] | undefined;
@@ -26,7 +28,7 @@ class Table extends React.Component<MyProps, {}> {
         value += rows[i][j].amount;
       }
       arrAverageValues.push(
-        <th key={keyUnic}>{Math.round(value / rows.length)}</th>
+        <th className={style.cell} key={keyUnic}>{Math.round(value / rows.length)}</th>
       );
       value = 0;
     }
@@ -51,7 +53,7 @@ class Table extends React.Component<MyProps, {}> {
       }
 
       return (
-        <table onMouseLeave={this.offAllLight}>
+        <table onMouseLeave={this.offAllLight} className={style.table}>
           <tbody>
             {tableRows}
             <tr key={"avaregeRow"}>{average}</tr>
