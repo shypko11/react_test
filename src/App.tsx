@@ -2,6 +2,7 @@ import { type } from "node:os";
 import React from "react";
 import { convetID, findClosest, randomNumber } from "./general";
 import Table from "./table/Table";
+import style from "./styles/App.module.css"
 
 type Data = {
   x: number;
@@ -298,25 +299,27 @@ class Matrix extends React.Component<MyProps, MyState> {
     // );
     // } else {
     return (
-      <div id="form_wrap">
-        <form id="formZ" onSubmit={this.createMatrix}>
-          <label>
-            <span style={{ display: "block" }}>Create Matrix</span>
-            <span>Rows:</span>
-            <input type="number" name="x" onChange={this.handleChange} />
-            <span>Columns:</span>
-            <input type="number" name="y" onChange={this.handleChange} />
-            <span>Amount closest numbers:</span>
-            <input type="number" name="closest" onChange={this.handleChange} />
+      <div id="form_wrap" className={style.form_wrap}>
+        <div className={style.startscreen}>
+        <form id="formZ" className={style.form} onSubmit={this.createMatrix}>
+          <label className={style.label}>
+            <span className={style.label_span} style={{ display: "block" }}>Create Matrix</span>
+            <span className={style.label_span}>Rows:</span>
+            <input className={style.form_input} type="number" name="x" onChange={this.handleChange} />
+            <span className={style.label_span}>Columns:</span>
+            <input className={style.form_input} type="number" name="y" onChange={this.handleChange} />
+            <span className={style.label_span}>Amount closest numbers:</span>
+            <input className={style.form_input} type="number" name="closest" onChange={this.handleChange} />
           </label>
-          <input className="button" type="submit" value="Create" />
+          <input className={style.button} type="submit" value="Create" />
         </form>
-        <button onClick={this.removeLine} className="button" id="removeButton">
+        <button onClick={this.removeLine} className={style.button} id="removeButton">
           Remove line
         </button>
-        <button onClick={this.addLine} className="button" id="addButton">
+        <button onClick={this.addLine} className={style.button} id="addButton">
           Add line
         </button>
+        </div>
         <div
           className="table_wrap"
           onClick={this.handleTableEvent}

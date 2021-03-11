@@ -1,0 +1,30 @@
+.cell {
+    position: relative;
+	height: 30px;
+	border: 1px solid black;
+}
+
+.percent {
+	position: absolute;
+	width: 100%;
+	background-color: blue;
+	bottom: 0;
+	left: 0;
+	opacity: 50%;
+	z-index: 0;
+}
+
+.light {
+	background-color: yellowgreen;
+}
+
+.base {
+	background-color: rgb(247 255 140);
+}
+
+
+.base:hover,
+.light:hover,
+.light:hover {
+	background-color: green;
+}

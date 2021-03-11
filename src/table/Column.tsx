@@ -1,6 +1,7 @@
 import React from "react";
 import type { CellType } from "../App";
 import Cell from "./cell/Cell";
+import style from "../styles/Column.module.css"
 
 interface MyProps {
   data: CellType[];
@@ -36,7 +37,7 @@ class Column extends React.Component<MyProps, {}> {
     let keyUnic = "sum" + this.props.collIndex;
     tableCol.push(
       <th key={keyUnic}
-        className="sum"
+        className={"sum " +  style.sum}
         data-collumnindex={this.props.collIndex}
         onMouseLeave={this.percentOff}
       >{sum}
