@@ -4,10 +4,10 @@ import './index.css';
 import Matrix from './App';
 import reportWebVitals from './reportWebVitals';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <Matrix />
-  </React.StrictMode>,
+let params = (globalThis as any)._customTableData;
+console.log(params);
+ReactDOM.hydrate(
+ <Matrix data={params}/>,
   document.getElementById('root')
 );
 
