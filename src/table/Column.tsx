@@ -24,18 +24,14 @@ class Column extends React.Component<MyProps, {}> {
   }
 
   render() {
-    console.log("th arr");
-    let tableCol = [];
+    let row = [];
     let sum = 0;
-    for (let i = 0; i < this.props.data.length; i++) {
-      let cellData: CellType = this.props.data[i];
-      let keyUnic = "cell" + this.props.collIndex + i;
-      sum += cellData.amount;
-      let columns = <Cell key={keyUnic} data={cellData} />;
-      tableCol.push(columns);
-    }
+    row = this.props.data.map((cell, i) => {
+      sum += cell.amount;
+      return (<Cell key={"cell" + this.props.collIndex + i} data={cell} />);
+    })
     let keyUnic = "sum" + this.props.collIndex;
-    tableCol.push(
+    row.push(
       <th key={keyUnic}
         className={"sum " +  style.sum}
         data-collumnindex={this.props.collIndex}
@@ -43,7 +39,7 @@ class Column extends React.Component<MyProps, {}> {
       >{sum}
       </th>
     );
-    return tableCol;
+    return row;
   }
 }
 
