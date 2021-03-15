@@ -2,14 +2,16 @@
 import React from "react";
 import Matrix from '../src/App';
 import {renderToString} from 'react-dom/server';
-import { createServer, IncomingMessage, ServerResponse } from 'http';
+import {createServer} from 'http';
+import type {IncomingMessage, ServerResponse} from 'http';
+
 const qs = require('qs');
  
   createServer(function(request: IncomingMessage, response: ServerResponse){
     let rowsData;
     let urlParams;
     let globalParams;
-    if(request.url.indexOf("closest=") !== -1 ){
+    if(request.url && request.url.indexOf("closest=") !== -1 ){
       urlParams = convert(request.url);
       rowsData = generateTable(urlParams.x, urlParams.y);
       if(urlParams && rowsData){
