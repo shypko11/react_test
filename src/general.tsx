@@ -9,9 +9,8 @@ export function findClosest(_id: number, rows: CellType[][], closest: number): A
     if (!qty) {
       return;
     }
-    for (let i = 0; i < data.length; i++) {
-      arrGeneral = arrGeneral.concat(data[i]);
-    }
+  
+    arrGeneral = data.reduce((acc, current) =>{ return  acc.concat(current)}, [])
     arrGeneral = arrGeneral.map((e) => {
       return e;
     });
@@ -19,7 +18,7 @@ export function findClosest(_id: number, rows: CellType[][], closest: number): A
       qty = arrGeneral.length;
     }
     const currentValue = arrGeneral[_id].amount;
-    sortByAmmount(arrGeneral);
+    arrGeneral = sortByAmmount(arrGeneral);
     let currentCell = arrGeneral.find((elem, i)=>(elem.amount === currentValue ? true : false ));
     if(currentCell){
       let currentPos = currentCell && arrGeneral.indexOf(currentCell);
@@ -27,7 +26,7 @@ export function findClosest(_id: number, rows: CellType[][], closest: number): A
         .concat([])
         .slice(
           Math.max(currentPos - qty, 0),
-          Math.min(currentPos + qty + 1, arrGeneral.length - 1)
+          Math.min(currentPos + qty + 1, arrGeneral.length)
         );
       result = possibleClosestRange
         .map((v, i) => ({ index: i, diff: Math.abs(currentValue - v.amount)  }))
@@ -38,7 +37,9 @@ export function findClosest(_id: number, rows: CellType[][], closest: number): A
      }
   }
   function sortByAmmount(arr: Array<CellType>) {
-    arr.sort((a, b) => a.amount - b.amount);
+    let arrCopy = arr.slice();
+    arrCopy.sort((a, b) => a.amount - b.amount);
+    return arrCopy;
   }
 }
 

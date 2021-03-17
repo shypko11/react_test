@@ -34,6 +34,10 @@ export type CellType = {
   readonly x: number;
   readonly y: number;
 };
+ type RowParams = {
+  cellsArr: CellType[];
+  sum: number;
+}
 
 type Data_attributes = {
   collumnindex?: number;
@@ -245,26 +249,27 @@ class Matrix extends React.Component<MyProps, MyState> {
     const y = this.state.y;
     const x = this.state.x;
     let emptyRowsArr = Array.from(new Array(y));
-    let emptycellsArr =  Array.from(new Array(x));
-    let lastCellId = 0;
-
-    let newRows = emptyRowsArr.map((e, i) => {
-      let sum = 0;
-      let cells =  emptycellsArr.map((el, j) => {
+    let emptyСellsArr =  Array.from(new Array(x));
+    let newRows = emptyRowsArr.map((e, i, arr) => {
+      let row : RowParams =  emptyСellsArr.reduce((acc, curr, j) => {
         let value = randomNumber(999, 100);
-        sum += value;
-        return ({
-          id: lastCellId++,
+        let newId = arr.length * i + j;
+        acc.sum += value;
+        let cellData = {
+          id: newId,
           amount: value,
           lighted: false,
           percent: "",
           showPercent: false,
           y: i,
           x: j
-        });
-      });
-     let cellsWithPersent =  cells.map(cell => {
-        let perc: number = (cell.amount / sum) * 100;
+        }
+        acc.cellsArr.push(cellData)
+        return acc;
+      }, {cellsArr: [], sum: 0});
+
+     let cellsWithPersent =  row.cellsArr.map(cell => {
+        let perc: number = (cell.amount /  row.sum) * 100;
         let percentValue: string = Math.round(perc) + "%";
         return {
           ...cell,
