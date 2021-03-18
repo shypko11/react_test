@@ -1,4 +1,3 @@
-import { type } from "node:os";
 import React from "react";
 import { convetID, findClosest, randomNumber } from "./general";
 import Table from "./table/Table";
@@ -35,6 +34,10 @@ export type CellType = {
   readonly x: number;
   readonly y: number;
 };
+ type RowParams = {
+  cellsArr: CellType[];
+  sum: number;
+}
 
 type Data_attributes = {
   collumnindex?: number;
@@ -115,15 +118,6 @@ class Matrix extends React.Component<MyProps, MyState> {
             });
             this.setState({ rows: table });
           }
-          // let newArr = this.state.rows;
-          // let row = this.state.rows[collumnindex]
-          // for(let i = 0; i < row.length; i++){
-          //   row[i] = {
-          //     ...row[i],
-          //     showPercent: true
-          //   }
-          // }
-          // this.setState({ rows: newArr });
         }
       }
     }
@@ -226,13 +220,14 @@ class Matrix extends React.Component<MyProps, MyState> {
       return;
     }
     let newArr = this.state.rows.slice();
-    let column: CellType[] = [];
     let lastRow = newArr[newArr.length - 1];
     let lastCellId = lastRow[lastRow.length - 1].id;
     let newY = lastRow[lastRow.length - 1].y;
-    for (let i = 0; i < newArr[0].length; i++) {
+    let rowLength = newArr[0].length;
+    let emptyRow = Array.from(new Array(rowLength));
+    let newRow = emptyRow.map((e, i) => {
       let value = randomNumber(999, 100);
-      column[i] = {
+      return ({
         id: ++lastCellId,
         amount: value,
         lighted: false,
@@ -240,9 +235,9 @@ class Matrix extends React.Component<MyProps, MyState> {
         showPercent: false,
         y: newY,
         x: i
-      };
-    }
-    newArr.push(column);
+      });
+    });
+    newArr.push(newRow);
     this.setState({ rows: newArr });
   }
 
@@ -253,40 +248,38 @@ class Matrix extends React.Component<MyProps, MyState> {
     }
     const y = this.state.y;
     const x = this.state.x;
-    let localRows = [];
-    let counter = 0;
-    if (x && y) {
-      for (let i = 0; i < x; i++) {
-        let sum = 0;
-        let column = [];
-        for (let j = 0; j < y; j++) {
-          let value = randomNumber(999, 100);
-          column[j] = {
-            id: counter++,
-            amount: value,
-            lighted: false,
-            percent: "",
-            showPercent: false,
-            x: j,
-            y: i
-          };
-          sum += value;
+    let emptyRowsArr = Array.from(new Array(y));
+    let emptyСellsArr =  Array.from(new Array(x));
+    let newRows = emptyRowsArr.map((e, i, arr) => {
+      let row : RowParams =  emptyСellsArr.reduce((acc, curr, j) => {
+        let value = randomNumber(999, 100);
+        let newId = arr.length * i + j;
+        acc.sum += value;
+        let cellData = {
+          id: newId,
+          amount: value,
+          lighted: false,
+          percent: "",
+          showPercent: false,
+          y: i,
+          x: j
         }
+        acc.cellsArr.push(cellData)
+        return acc;
+      }, {cellsArr: [], sum: 0});
 
-        for (let k = 0; k < column.length; k++) {
-          let perc: number = (column[k].amount / sum) * 100;
-          let percentValue: string = Math.round(perc) + "%";
-          column[k] = {
-            ...column[k],
-            percent: percentValue
-          };
+     let cellsWithPersent =  row.cellsArr.map(cell => {
+        let perc: number = (cell.amount /  row.sum) * 100;
+        let percentValue: string = Math.round(perc) + "%";
+        return {
+          ...cell,
+          percent: percentValue
         }
-
-        localRows.push(column);
-      }
-    }
-
-    this.setState({ rows: localRows });
+      })
+      return cellsWithPersent;
+    });
+   
+    this.setState({ rows: newRows });
   }
 
   render() {

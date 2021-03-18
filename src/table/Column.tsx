@@ -8,6 +8,10 @@ interface MyProps {
   collIndex: number;
 }
 
+type Row = {
+  cells: JSX.Element[];
+  sum: number;
+}
 class Column extends React.Component<MyProps, {}> {
   shouldComponentUpdate(nextProps: MyProps) {
     let newValues =nextProps.data;
@@ -24,26 +28,23 @@ class Column extends React.Component<MyProps, {}> {
   }
 
   render() {
-    console.log("th arr");
-    let tableCol = [];
-    let sum = 0;
-    for (let i = 0; i < this.props.data.length; i++) {
-      let cellData: CellType = this.props.data[i];
-      let keyUnic = "cell" + this.props.collIndex + i;
-      sum += cellData.amount;
-      let columns = <Cell key={keyUnic} data={cellData} />;
-      tableCol.push(columns);
-    }
+    let row : Row  = this.props.data.reduce((acc, cur, i) => {
+      let cell = <Cell key={"cell" + this.props.collIndex + i} data={cur} />
+      acc.cells[i]= cell;
+      acc.sum += cur.amount; 
+      return (acc);
+    }, {cells: [] as JSX.Element[], sum: 0});
+
     let keyUnic = "sum" + this.props.collIndex;
-    tableCol.push(
+    row.cells.push(
       <th key={keyUnic}
         className={"sum " +  style.sum}
         data-collumnindex={this.props.collIndex}
         onMouseLeave={this.percentOff}
-      >{sum}
+      >{row.sum}
       </th>
     );
-    return tableCol;
+    return row.cells;
   }
 }
 

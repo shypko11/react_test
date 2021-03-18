@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .wrapper {
+            position: relative;
+        }
+
+        #rect {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 50px;
+            height: 50px;
+            background-color: rgb(238, 81, 81);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div id="rect"> </div>
+    </div>
+    <script>
+        window.onload = function () {
+          
+            let timeFraction;
+
+            function animate(options) {
+                let start = performance.now();
+                requestAnimationFrame(function animate(time) {
+                    timeFraction = (time - start) / options.duration;
+                    if (timeFraction > 1) timeFraction = 1;
+                    let progress = options.timing(timeFraction)
+                    options.draw(progress);
+                    if (timeFraction < 1) {
+                        requestAnimationFrame(animate);
+                    }
+                });
+            }
+
+
+            function makeEaseInOut(x) {
+                return x < 0.5 ?
+                 2 * x * x :
+                 1 - Math.pow((-2 * x + 2), 2) / 2;
+
+            }
+            animate({
+                duration: 3000,
+                timing: makeEaseInOut,
+                draw: function (progress) {
+                    if(progress < 0 ) progress = -progress;
+                    rect.style.left = progress * 500 + 'px';
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -10,10 +10,7 @@ class Cell extends React.Component<MyProps, {}> {
   shouldComponentUpdate(nextProps: MyProps) {
     let newValues =nextProps.data;
     let oldValues = this.props.data;
-    if(newValues === oldValues){
-      return false;
-    }
-    return true;
+    return newValues !== oldValues;
   }
 
   render() {
